@@ -5,11 +5,13 @@ from scipy import signal
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Define your directory and the subject files you want to process
 directory = '/Users/similovesyou/eeg-hackathon/data'
 
-subjects = [f'S{i:03}' for i in range(1, 110)]  # Creates S001, S002, ..., S010
+subjects = [f'S{i:03}' for i in range(1, 110)]  # Creates S001, S002, ..., S109
 
 # Initialize lists to hold features and labels
 features = []
@@ -76,6 +78,8 @@ kf = KFold(n_splits=10, shuffle=True, random_state=42)
 
 # Lists to hold performance metrics
 accuracies = []
+all_y_test = []
+all_y_pred = []
 
 for train_index, test_index in kf.split(features):
     X_train, X_test = features[train_index], features[test_index]
@@ -91,9 +95,22 @@ for train_index, test_index in kf.split(features):
     # Evaluate the model
     accuracy = accuracy_score(y_test, y_pred)
     accuracies.append(accuracy)
+    all_y_test.extend(y_test)
+    all_y_pred.extend(y_pred)
     print(f"Fold Accuracy: {accuracy}")
     print("Classification Report:\n", classification_report(y_test, y_pred))
     print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 
 # Print average accuracy
 print(f"Average Accuracy: {np.mean(accuracies)}")
+
+# Plot the overall confusion matrix
+conf_matrix = confusion_matrix(all_y_test, all_y_pred)
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', cbar=False,
+            xticklabels=['Eyes Open', 'Eyes Closed'],
+            yticklabels=['Eyes Open', 'Eyes Closed'])
+plt.title('Confusion Matrix for Random Forest Classifier\n(Overall Performance Across K-Folds)')
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.show()
