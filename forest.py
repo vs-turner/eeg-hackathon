@@ -31,48 +31,6 @@ bands = {
     'Gamma': (30, 50)
 }
 
-# for subject_id in subjects:
-#     print(f'\nProcessing subject: {subject_id}')
-    
-#     # Define file names for the subject
-#     file_R01 = f'{subject_id}R01.edf'  # Eyes open
-#     file_R02 = f'{subject_id}R02.edf'  # Eyes closed
-    
-#     file_paths = [os.path.join(directory, file_R01), os.path.join(directory, file_R02)]
-    
-#     try:
-#         # Open both EDF files
-#         with pyedflib.EdfReader(file_paths[0]) as f1, pyedflib.EdfReader(file_paths[1]) as f2:
-#             signal_labels = f1.getSignalLabels()
-#             sample_rate = int(f1.getSampleFrequency(0))
-
-#             # Loop through all channels and extract features
-#             for channel in signal_labels:
-#                 index_R01 = signal_labels.index(channel)
-#                 index_R02 = signal_labels.index(channel)
-
-#                 # Read signals
-#                 signal_data_R01 = f1.readSignal(index_R01)
-#                 signal_data_R02 = f2.readSignal(index_R02)
-
-#                 # Extract features for each frequency band
-#                 feature_R01 = [extract_band_power(signal_data_R01, sample_rate, band_range) for band_name, band_range in bands.items()]
-#                 feature_R02 = [extract_band_power(signal_data_R02, sample_rate, band_range) for band_name, band_range in bands.items()]
-
-#                 # Append features and labels
-#                 features.append(feature_R01)
-#                 labels.append(0)  # Label for eyes open
-
-#                 features.append(feature_R02)
-#                 labels.append(1)  # Label for eyes closed
-
-#     except Exception as e:
-#         print(f'Error reading files for {subject_id}: {e}')
-
-# # Convert to numpy arrays
-# features = np.array(features)  # Convert features to numpy array
-# labels = np.array(labels)     # Convert labels to numpy array
-
 for subject_id in subjects:
     print(f'\nProcessing subject: {subject_id}')
     
