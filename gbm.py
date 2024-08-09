@@ -46,7 +46,11 @@ for subject_id in subjects:
             signal_labels = f1.getSignalLabels()
             sample_rate = int(f1.getSampleFrequency(0))
 
-            # Loop through all channels and extract features
+            # Initialize lists to accumulate features for this subject
+            subject_feature_R01 = []
+            subject_feature_R02 = []
+
+            # Loop through all channels and accumulate features
             for channel in signal_labels:
                 index_R01 = signal_labels.index(channel)
                 index_R02 = signal_labels.index(channel)
@@ -55,23 +59,30 @@ for subject_id in subjects:
                 signal_data_R01 = f1.readSignal(index_R01)
                 signal_data_R02 = f2.readSignal(index_R02)
 
-                # Extract features for each frequency band
+                # Extract features for each frequency band and accumulate
                 feature_R01 = [extract_band_power(signal_data_R01, sample_rate, band_range) for band_name, band_range in bands.items()]
                 feature_R02 = [extract_band_power(signal_data_R02, sample_rate, band_range) for band_name, band_range in bands.items()]
 
-                # Append features and labels
-                features.append(feature_R01)
-                labels.append(0)  # Label for eyes open
+                subject_feature_R01.append(feature_R01)
+                subject_feature_R02.append(feature_R02)
 
-                features.append(feature_R02)
-                labels.append(1)  # Label for eyes closed
+            # Average the features across all channels for this subject
+            subject_feature_R01 = np.mean(subject_feature_R01, axis=0)
+            subject_feature_R02 = np.mean(subject_feature_R02, axis=0)
+
+            # Append aggregated features and labels
+            features.append(subject_feature_R01)
+            labels.append(0)  # Label for eyes open
+
+            features.append(subject_feature_R02)
+            labels.append(1)  # Label for eyes closed
 
     except Exception as e:
         print(f'Error reading files for {subject_id}: {e}')
 
 # Convert to numpy arrays
-features = np.array(features)  # Convert features to numpy array
-labels = np.array(labels)     # Convert labels to numpy array
+features = np.array(features)
+labels = np.array(labels)
 
 # Initialize K-Fold cross-validation
 kf = KFold(n_splits=10, shuffle=True, random_state=42)
